@@ -5,7 +5,6 @@ import busRoutes from "./routes/busRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 
 dotenv.config();
-connectDB();
 
 const app = express();
 app.use(express.json());
@@ -13,8 +12,18 @@ app.use(express.json());
 app.use("/api/buses", busRoutes);
 app.use("/api/bookings", bookingRoutes);
 
+// ✅ ADD THIS HEALTH CHECK
+app.get("/", (req, res) => {
+  res.send("Bus Booking API is running 🚍");
+});
+
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+// ✅ CONNECT DB BEFORE LISTEN
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error("MongoDB connection failed", err);
 });
